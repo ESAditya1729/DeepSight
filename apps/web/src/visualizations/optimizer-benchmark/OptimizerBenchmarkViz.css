@@ -1,0 +1,141 @@
+.ob-viz {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.ob-canvas-wrap { flex-shrink: 0; }
+
+.ob-canvas {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  touch-action: none;
+  display: block;
+}
+
+.ob-sidebar {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ob-readout {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--code-bg);
+}
+
+.ob-readout h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.ob-info {
+  font-size: 0.8rem;
+  color: var(--text);
+  margin: 0.4rem 0 0;
+  opacity: 0.7;
+}
+
+.ob-surface-select {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.ob-surface-btn {
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ob-surface-btn:hover { border-color: var(--accent-border); }
+.ob-surface-btn--active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.ob-opt-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.4rem;
+}
+
+.ob-opt-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.45rem;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+
+.ob-opt-btn:hover { background: var(--accent-bg); }
+.ob-opt-btn--active { background: var(--accent-bg); }
+
+.ob-opt-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+.ob-lr-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+.ob-lr-label { font-size: 0.68rem; font-weight: 600; min-width: 4rem; }
+
+.ob-slider {
+  flex: 1;
+  height: 3px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.ob-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.ob-lr-value {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  min-width: 3.5rem;
+  text-align: right;
+  color: var(--text);
+}
+
+.ob-bar-canvas {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: block;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .ob-viz { flex-direction: column; }
+}

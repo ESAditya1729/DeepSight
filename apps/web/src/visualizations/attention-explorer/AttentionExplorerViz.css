@@ -1,0 +1,219 @@
+.ae-viz {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.ae-canvas-wrap {
+  flex-shrink: 0;
+}
+
+.ae-canvas {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--code-bg);
+  touch-action: none;
+}
+
+.ae-sidebar {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ae-readout {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--code-bg);
+}
+
+.ae-readout h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.ae-info {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text);
+  margin: 0.5rem 0 0;
+}
+
+/* Presets */
+.ae-presets {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.ae-preset-btn {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.ae-preset-btn:hover { border-color: var(--accent-border); background: var(--accent-bg); }
+
+.ae-preset-btn--active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Controls */
+.ae-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ae-control-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ae-control-label {
+  font-size: 0.75rem;
+  color: var(--text);
+  min-width: 5rem;
+}
+
+.ae-control-value {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--text-h);
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+.ae-head-btns {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.ae-head-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  opacity: 0.4;
+}
+
+.ae-head-btn--active { opacity: 1; }
+.ae-head-btn--ring { outline: 2px solid var(--text-h); outline-offset: 1px; }
+
+.ae-slider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.ae-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.ae-view-btns {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.ae-view-btn {
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ae-view-btn--active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Attention bars */
+.ae-attn-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ae-attn-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ae-attn-bar-row--self {
+  opacity: 0.5;
+}
+
+.ae-attn-bar-token {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-h);
+  min-width: 4.5rem;
+}
+
+.ae-attn-bar-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.ae-attn-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.2s;
+}
+
+.ae-attn-bar-weight {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text);
+  min-width: 3rem;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .ae-viz { flex-direction: column; }
+}

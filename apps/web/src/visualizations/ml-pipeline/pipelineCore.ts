@@ -1,0 +1,262 @@
+// Pure computation layer for the ML Pipeline visualization. Everything here is
+// framework-agnostic (no React) so it can be unit-tested deterministically and
+// shared between the interactive steps and the test suite.
+//
+// The vocabulary, the context formula, and the scoring all live here so that the
+// PredictStep UI and the tests exercise the exact same logic.
+
+import { getBasePosition, getWordPosition, mapSimilarity, normalizeWord, categoryFor } from "./embeddingSpace";
+
+export interface WordEmbedding {
+  word: string;
+  x: number;
+  y: number;
+}
+
+export interface Prediction {
+  word: string;
+  score: number;
+  category: string;
+}
+
+// All candidate next-words, grouped by semantic category. These must be subset of
+// (or consistent with) the CATEGORIES in embeddingSpace.ts so they live in the same
+// coordinate space as the sentence tokens.
+export const VOCAB_WORDS: { word: string; category: string }[] = [
+  // Surfaces
+  { word: "mat", category: "Surface" },
+  { word: "bed", category: "Surface" },
+  { word: "chair", category: "Surface" },
+  { word: "table", category: "Surface" },
+  { word: "floor", category: "Surface" },
+  { word: "rug", category: "Surface" },
+  { word: "sofa", category: "Surface" },
+  { word: "couch", category: "Surface" },
+  // Places
+  { word: "river", category: "Place" },
+  { word: "park", category: "Place" },
+  { word: "store", category: "Place" },
+  { word: "school", category: "Place" },
+  { word: "home", category: "Place" },
+  { word: "office", category: "Place" },
+  { word: "shop", category: "Place" },
+  // Animals
+  { word: "dog", category: "Animal" },
+  { word: "bird", category: "Animal" },
+  { word: "fish", category: "Animal" },
+  { word: "lion", category: "Animal" },
+  { word: "horse", category: "Animal" },
+  // Actions
+  { word: "ran", category: "Action" },
+  { word: "jumped", category: "Action" },
+  { word: "walked", category: "Action" },
+  { word: "played", category: "Action" },
+  { word: "slept", category: "Action" },
+  { word: "flew", category: "Action" },
+  // Size
+  { word: "small", category: "Size" },
+  { word: "large", category: "Size" },
+  // Colors
+  { word: "red", category: "Color" },
+  { word: "blue", category: "Color" },
+  { word: "green", category: "Color" },
+  // Emotion
+  { word: "sad", category: "Emotion" },
+  { word: "angry", category: "Emotion" },
+  // People
+  { word: "king", category: "Person" },
+  { word: "queen", category: "Person" },
+  { word: "man", category: "Person" },
+  { word: "woman", category: "Person" },
+  // Speed
+  { word: "quick", category: "Speed" },
+  { word: "slow", category: "Speed" },
+  // Money (share the same region as places, close to "bank")
+  { word: "money", category: "Money" },
+  { word: "cash", category: "Money" },
+  { word: "deposit", category: "Money" },
+  { word: "pay", category: "Money" },
+];
+
+// Stopwords are skipped when picking the "last content word" for context, because
+// words like "the"/"to" carry no semantic weight and would drag predictions toward
+// the Function cluster at the origin.
+const STOPWORDS = new Set(["the", "a", "an", "of", "to", "on", "in", "at", "by", "with", "from", "and", "for", "is", "are", "was", "were"]);
+
+/** Words that should never be predicted (they'd always be wrong / are trivial). */
+const BLOCKED = new Set(["bank"]);
+
+export function isStopword(word: string): boolean {
+  return STOPWORDS.has(normalizeWord(word));
+}
+
+/** Compute sentence embeddings for each token (order-preserving, occurrence-aware). */
+export function generateEmbeddings(tokens: string[], seed: number): WordEmbedding[] {
+  const occurrenceCount: Record<string, number> = {};
+  return tokens.map((token) => {
+    const lower = normalizeWord(token);
+    const occurrence = occurrenceCount[lower] ?? 0;
+    occurrenceCount[lower] = occurrence + 1;
+    const { x, y } = getWordPosition(token, seed, occurrence);
+    return { word: token, x, y };
+  });
+}
+
+/** Similarity of every token pair using mapSimilarity (Gaussian on distance). */
+export function computeSimilarityMatrix(embeddings: WordEmbedding[]): number[][] {
+  return embeddings.map((a) => embeddings.map((b) => mapSimilarity([a.x, a.y], [b.x, b.y])));
+}
+
+/** Softmax with an optional temperature (lower = sharper). */
+export function softmax(arr: number[], temperature: number): number[] {
+  const scaled = arr.map((x) => x / temperature);
+  const max = Math.max(...scaled);
+  const exps = scaled.map((x) => Math.exp(x - max));
+  const sum = exps.reduce((a, b) => a + b, 0);
+  return exps.map((x) => x / sum);
+}
+
+/** Self-attention weights from the similarity matrix via row-wise softmax. */
+export function computeAttention(simMatrix: number[][], temperature: number): number[][] {
+  return simMatrix.map((row) => softmax(row, temperature));
+}
+
+/**
+ * Builds the context vector used for next-word prediction.
+ * Context = 0.75 * lastContentWord + 0.25 * sentenceAverage.
+ * We skip stopwords for the "last content word" so the prediction is driven by the
+ * most recent meaningful word (e.g. "sat" in "The cat sat on the ___") rather than a
+ * trailing article like "the" or "to".
+ */
+export function contextVector(embeddings: WordEmbedding[]): [number, number] {
+  const contentEmbs = embeddings.filter((e) => !isStopword(e.word));
+  const pool = contentEmbs.length > 0 ? contentEmbs : embeddings;
+
+  const avgX = pool.reduce((sum, e) => sum + e.x, 0) / pool.length;
+  const avgY = pool.reduce((sum, e) => sum + e.y, 0) / pool.length;
+
+  const last = pool[pool.length - 1];
+  return [last.x * 0.75 + avgX * 0.25, last.y * 0.75 + avgY * 0.25];
+}
+
+/**
+ * Positions the candidate vocabulary in the same coordinate space as the sentence
+ * tokens for a given seed.
+ */
+export function positionVocab(seed: number): { word: string; x: number; y: number; category: string }[] {
+  return VOCAB_WORDS.map((v) => ({ ...v, ...getBasePosition(v.word, seed) }));
+}
+
+// A tiny "training set" the model has (allegedly) learned from. Matching the tail of the
+// user's input against these lets the model pick the sensible category even when raw
+// geometric nearest-neighbour would be fooled by overlapping clusters. Each entry is the
+// sentence plus the word that followed it in "training".
+interface TrainingExample {
+  text: string;
+  nextWord: string;
+}
+
+const TRAINING_EXAMPLES: TrainingExample[] = [
+  { text: "The cat sat on the", nextWord: "mat" },
+  { text: "The dog slept on the", nextWord: "rug" },
+  { text: "She went to the bank to", nextWord: "deposit" },
+  { text: "The happy child played", nextWord: "jumped" },
+  { text: "The quick brown fox jumps", nextWord: "quick" },
+  { text: "A king and queen rule", nextWord: "king" },
+];
+
+/**
+ * Finds the training example with the longest matching tail against the input. Returns
+ * its category label, or null if the input doesn't resemble any example closely enough.
+ */
+export function matchTrainingExample(inputTokens: string[]): { nextWord: string; category: string } | null {
+  const inputNorm = inputTokens.map((w) => normalizeWord(w));
+  let best = { nextWord: "", category: "", overlap: 0 };
+
+  for (const ex of TRAINING_EXAMPLES) {
+    const exNorm = normalizeWord(ex.text).split(/\s+/);
+    let overlap = 0;
+    while (
+      overlap < exNorm.length &&
+      overlap < inputNorm.length &&
+      exNorm[exNorm.length - 1 - overlap] === inputNorm[inputNorm.length - 1 - overlap]
+    ) {
+      overlap++;
+    }
+    // Only treat it as a match when we cover most of the example (so a 1-word tail like
+    // "the" doesn't match every sentence). Requires overlap across at least 2 words.
+    if (overlap >= 2 && overlap >= exNorm.length - 1 && overlap > best.overlap) {
+      const cat = categoryFor(normalizeWord(ex.nextWord))?.name ?? "";
+      best = { nextWord: ex.nextWord, category: cat, overlap };
+    }
+  }
+
+  return best.overlap > 0 ? { nextWord: best.nextWord, category: best.category } : null;
+}
+
+/**
+ * Rank the entire vocabulary by "how well it fits here". Uses a two-stage model:
+ *
+ *  1. CASE-BASED: look for a training example whose ending matches the tail of the input
+ *     (the "similar input I've seen before" reasoning a child understands). If a match is
+ *     found, the training answer's category is highlighted.
+ *  2. GEOMETRIC: score every vocabulary word by similarity to the whole-sentence context,
+ *     so even unseen inputs produce sensible, confidence-scaled predictions.
+ *
+ * The two are blended: the matched category's words get a boost, and geometric similarity
+ * orders the results within/across categories.
+ */
+export function predictNextWord(
+  context: [number, number],
+  vocab: { word: string; x: number; y: number; category: string }[],
+  inputTokens: string[],
+  topN = 8,
+): Prediction[] {
+  const used = new Set(inputTokens.map((w) => normalizeWord(w)));
+
+  // Geometric base score for every candidate.
+  const candidates = vocab
+    .filter((v) => !used.has(normalizeWord(v.word)) && !BLOCKED.has(normalizeWord(v.word)))
+    .map((v) => ({
+      word: v.word,
+      category: v.category,
+      score: mapSimilarity(context, [v.x, v.y]),
+    }));
+
+  // Case-based category boost: when the input resembles a training example, the word the
+  // model "remembers" following that example is its best guess and ranks first, followed
+  // by the rest of that example's category (ordered by geometric similarity), then the
+  // remaining vocabulary. This mirrors how a real model "uses what it has seen before".
+  const matched = matchTrainingExample(inputTokens);
+  if (matched) {
+    const remembered = candidates.find((c) => c.word === matched.nextWord);
+    const inMatched = candidates
+      .filter((c) => c.category === matched.category && c.word !== matched.nextWord)
+      .sort((a, b) => b.score - a.score);
+    const others = candidates
+      .filter((c) => c.category !== matched.category)
+      .sort((a, b) => b.score - a.score);
+    candidates.length = 0;
+    if (remembered) candidates.push(remembered);
+    candidates.push(...inMatched, ...others);
+  } else {
+    candidates.sort((a, b) => b.score - a.score);
+  }
+  const top = candidates.slice(0, topN);
+  if (top.length === 0) return [];
+
+  const maxScore = top[0].score;
+  const minScore = top[top.length - 1].score;
+  const range = maxScore - minScore || 1;
+  return top.map((s) => ({ ...s, score: (s.score - minScore) / range }));
+}
+
+// Expected answer (for the default presets) — the word a child is meant to discover.
+// Used by the UI to show a "did you get it?" result and by tests to verify correctness.
+// Must stay consistent with TRAINING_EXAMPLES.
+export const GROUND_TRUTH: Record<string, string> = {
+  "The cat sat on the": "mat",
+  "She went to the bank to": "deposit",
+  "The happy child played": "jumped",
+  "The quick brown fox jumps": "quick",
+};

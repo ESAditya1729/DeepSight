@@ -1,0 +1,265 @@
+.nn-viz {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.nn-canvas-wrap {
+  flex-shrink: 0;
+}
+
+.nn-canvas {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--code-bg);
+}
+
+.nn-sidebar {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.nn-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--code-bg);
+}
+
+.nn-controls h3 {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.nn-readout {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--code-bg);
+}
+
+.nn-readout h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+/* Architecture config */
+.nn-arch-config {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.nn-arch-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nn-arch-label {
+  font-size: 0.75rem;
+  min-width: 5rem;
+  color: var(--text);
+}
+
+.nn-arch-fixed {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-h);
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.nn-arch-value {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.nn-size-slider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.nn-size-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.nn-arch-btns {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+}
+
+.nn-arch-btn {
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.nn-arch-btn:hover:not(:disabled) { background: var(--accent-bg); border-color: var(--accent-border); }
+.nn-arch-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Activation selector */
+.nn-act-select {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.nn-act-btn {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.nn-act-btn:hover { border-color: var(--accent-border); }
+
+.nn-act-btn--active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Dataset selector */
+.nn-dataset-select {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.nn-dataset-btn {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.nn-dataset-btn:hover { border-color: var(--accent-border); }
+
+.nn-dataset-btn--active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.nn-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.nn-toggle input { accent-color: var(--accent); cursor: pointer; }
+
+/* Stats */
+.nn-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem 1rem;
+}
+
+.nn-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.nn-stat-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.nn-stat-value {
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.nn-loss-chart { margin-top: 0.5rem; }
+
+.nn-loss-canvas {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: block;
+}
+
+/* Predictions grid */
+.nn-input-grid {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 0.25rem 0.5rem;
+  font-size: 0.82rem;
+}
+
+.nn-input-header {
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.nn-input-cell {
+  font-family: var(--mono);
+  text-align: center;
+  padding: 0.2rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+}
+
+.nn-input-cell--input { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
+.nn-input-cell--target { background: #dcfce7; color: #166534; }
+.nn-input-cell--correct { background: #dcfce7; color: #166534; }
+.nn-input-cell--wrong { background: #fee2e2; color: #991b1b; }
+
+@media (max-width: 768px) {
+  .nn-viz { flex-direction: column; }
+}

@@ -1,0 +1,608 @@
+/* Shared step layout */
+.pl-step-content {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.pl-step-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pl-step-right {
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pl-canvas-wrap {
+  flex-shrink: 0;
+}
+
+.pl-canvas {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--code-bg);
+}
+
+.pl-readout {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--code-bg);
+}
+
+.pl-readout h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.pl-info {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text);
+  margin: 0;
+}
+
+.pl-info code {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  background: var(--surface);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--accent);
+}
+
+/* Input Step */
+.pl-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-h);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.pl-textarea:focus {
+  border-color: var(--accent);
+}
+
+.pl-apply-btn {
+  margin-top: 0.5rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.pl-apply-btn:hover {
+  opacity: 0.85;
+}
+
+.pl-preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.pl-preset-btn {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.pl-preset-btn:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.pl-preset-btn--active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.pl-input-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.pl-input-token {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pl-flow-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+}
+
+.pl-flow-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text);
+}
+
+.pl-flow-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  flex-shrink: 0;
+}
+
+/* Tokenize Step */
+.pl-tokens-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.4rem;
+}
+
+.pl-token-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.pl-token-index {
+  font-size: 0.65rem;
+  font-family: var(--mono);
+  color: var(--text);
+  margin-bottom: 0.15rem;
+}
+
+.pl-token-word {
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: var(--mono);
+  color: var(--text-h);
+}
+
+.pl-token-len {
+  font-size: 0.6rem;
+  color: var(--text);
+  margin-top: 0.15rem;
+}
+
+.pl-token-sequence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.pl-token-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pl-token-badge-idx {
+  font-size: 0.6rem;
+  opacity: 0.6;
+}
+
+.pl-formula {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+/* Embed Step */
+.pl-embed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.pl-embed-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+}
+
+.pl-embed-row:nth-child(odd) {
+  background: var(--surface);
+}
+
+.pl-embed-word {
+  font-weight: 700;
+}
+
+.pl-embed-vec {
+  color: var(--text);
+  font-size: 0.72rem;
+}
+
+/* Similarity Step */
+.pl-sim-legend {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pl-sim-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  color: var(--text);
+}
+
+.pl-sim-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.pl-pairs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.pl-pair-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.pl-pair-words {
+  flex: 0 0 120px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.pl-pair-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--surface);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.pl-pair-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.pl-pair-sim {
+  flex: 0 0 40px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Attention Step */
+.pl-attention-token-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.pl-attention-token-btn {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pl-attention-token-btn:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.pl-attention-token-btn--active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.pl-attention-token-idx {
+  font-size: 0.6rem;
+  opacity: 0.6;
+}
+
+.pl-attention-details {
+  margin-top: 0.25rem;
+}
+
+.pl-attention-bar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.pl-attention-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+}
+
+.pl-attention-bar-label {
+  flex: 0 0 70px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+}
+
+.pl-attention-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.pl-attention-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.pl-attention-bar-val {
+  flex: 0 0 38px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+/* Predict Step */
+.pl-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem 1rem;
+}
+
+.pl-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.pl-stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.pl-stat-value {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.pl-predict-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pl-predict-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.pl-predict-btn:hover {
+  opacity: 0.85;
+}
+
+.pl-predict-btn--secondary {
+  background: transparent;
+  color: var(--accent);
+}
+
+.pl-predict-btn--secondary:hover {
+  background: var(--accent-bg);
+}
+
+.pl-arch-display {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.pl-arch-layer {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-h);
+  text-align: center;
+  font-family: var(--mono);
+}
+
+.pl-arch-layer small {
+  font-weight: 400;
+  color: var(--text);
+}
+
+.pl-arch-arrow {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Steps list (ordered/unordered) */
+.pl-steps-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.pl-steps-list li {
+  margin-bottom: 0.3rem;
+}
+
+.pl-steps-list li strong {
+  color: var(--text-h);
+}
+
+/* Prediction examples */
+.pl-predict-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+.pl-predict-examples code {
+  display: block;
+  padding: 0.4rem 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+
+/* Vocabulary chips */
+.pl-vocab-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+}
+
+.pl-vocab-chip {
+  padding: 0.2rem 0.5rem;
+  border: 1px solid;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--surface);
+}
+
+.pl-vocab-more {
+  font-size: 0.7rem;
+  color: var(--text);
+  align-self: center;
+  font-family: var(--mono);
+}
+
+/* Mask token */
+.pl-input-token--mask {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-color: var(--accent) !important;
+  animation: pl-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pl-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pl-step-content {
+    flex-direction: column;
+  }
+  .pl-step-right {
+    min-width: 0;
+  }
+  .pl-stepper {
+    overflow-x: auto;
+  }
+  .pl-step-label {
+    display: none;
+  }
+}
