@@ -197,18 +197,6 @@
   flex: 1;
 }
 
-.sidebar-badge {
-  font-size: 0.58rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.08rem 0.35rem;
-  border-radius: 99px;
-  background: var(--accent);
-  color: #fff;
-  line-height: 1.4;
-}
-
 .sidebar-footer {
   padding: 0.6rem 0.85rem;
   border-top: 1px solid var(--border);

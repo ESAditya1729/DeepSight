@@ -7,6 +7,7 @@ export * from "./matrix.js";
 export * from "./calculus.js";
 export * from "./losses.js";
 export * from "./nn/activations.js";
+export * from "./nn/attention.js";
 export * from "./nn/layers.js";
 export * from "./nn/network.js";
 export * from "./nn/trainer.js";

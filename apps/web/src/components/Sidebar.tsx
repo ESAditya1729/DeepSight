@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { visualizationRegistry, CATEGORY_LABELS, CATEGORY_ORDER, type VizCategory, type VisualizationEntry } from "../registry";
-
-const NEW_SLUGS = new Set(
-  visualizationRegistry.filter((v: VisualizationEntry) => v.isNew).map((v: VisualizationEntry) => v.slug),
-);
+import { visualizationRegistry, CATEGORY_LABELS, CATEGORY_ORDER, type VizCategory } from "../registry";
 
 const CATEGORY_ICONS: Record<VizCategory, string> = {
   "pipeline": "PL",
@@ -66,9 +62,6 @@ export default function Sidebar() {
                       }
                     >
                       <span className="sidebar-link-text">{viz.title}</span>
-                      {NEW_SLUGS.has(viz.slug) && (
-                        <span className="sidebar-badge">New</span>
-                      )}
                     </NavLink>
                   ))}
                 </div>

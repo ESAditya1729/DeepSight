@@ -15,7 +15,6 @@ export interface VisualizationEntry {
   title: string;
   description: string;
   category: VizCategory;
-  isNew?: boolean;
 }
 
 export const CATEGORY_LABELS: Record<VizCategory, string> = {
@@ -40,7 +39,6 @@ export const visualizationRegistry: VisualizationEntry[] = [
     title: "ML Pipeline",
     description: "Follow the complete journey from raw text to prediction — tokenize, embed, compute similarity, apply attention, and classify. Step through each stage of an ML pipeline interactively.",
     category: "pipeline",
-    isNew: true,
   },
   {
     slug: "dot-product",
@@ -75,29 +73,25 @@ export const visualizationRegistry: VisualizationEntry[] = [
   {
     slug: "attention-explorer",
     title: "Attention Explorer",
-    description: "Visualize transformer self-attention — click tokens to see attention weights, adjust temperature, and explore multi-head patterns.",
+    description: "Real Q/K/V self-attention — inspect the query, key, and value projections and watch softmax turn raw scores into attention weights.",
     category: "neural-networks",
-    isNew: true,
   },
   {
     slug: "backprop-flow",
     title: "Backprop Flow",
     description: "See gradients flow backward through a network. Compare healthy ReLU flow vs vanishing sigmoid and exploding gradients.",
     category: "neural-networks",
-    isNew: true,
   },
   {
     slug: "optimizer-benchmark",
     title: "Optimizer Benchmark",
     description: "Race 6 optimizers on different loss surfaces — compare convergence, speed, and final loss side by side.",
     category: "optimization",
-    isNew: true,
   },
   {
     slug: "decision-boundary-lab",
     title: "Decision Boundary Lab",
     description: "Train a neural network on 2D datasets and watch the decision boundary evolve in real time.",
     category: "neural-networks",
-    isNew: true,
   },
 ];

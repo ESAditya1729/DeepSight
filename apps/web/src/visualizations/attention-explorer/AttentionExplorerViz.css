@@ -1,5 +1,11 @@
 .ae-viz {
   display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ae-top {
+  display: flex;
   gap: 1.5rem;
   align-items: flex-start;
 }
@@ -15,12 +21,29 @@
   touch-action: none;
 }
 
-.ae-sidebar {
+.ae-controls-rail {
   flex: 1;
   min-width: 280px;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+/* Explanation area — full page width, below the canvas + controls */
+.ae-explain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ae-explain-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.ae-explain-span {
+  grid-column: 1 / -1;
 }
 
 .ae-readout {
@@ -167,6 +190,200 @@
   border-color: var(--accent);
 }
 
+/* Intro callout */
+.ae-intro {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 10px;
+  background: var(--accent-bg);
+}
+
+.ae-intro p {
+  font-size: 0.83rem;
+  line-height: 1.55;
+  color: var(--text);
+  margin: 0;
+}
+
+.ae-intro p + p {
+  margin-top: 0.5rem;
+}
+
+/* How Q, K, V are built — calculator */
+.ae-qkv-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+
+.ae-qkv-pick-btn {
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  width: 28px;
+  height: 28px;
+  border: 2px solid;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ae-qkv-index-picker {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.ae-index-btn {
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ae-calc {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.6rem;
+  border-radius: 8px;
+  background: var(--code-bg);
+}
+
+.ae-calc-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ae-calc-row-label {
+  font-size: 0.68rem;
+  color: var(--text);
+  min-width: 4.5rem;
+  flex-shrink: 0;
+}
+
+.ae-calc-chips {
+  display: flex;
+  gap: 0.2rem;
+  flex-wrap: wrap;
+}
+
+.ae-calc-chip {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 0.1rem 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-h);
+  background: var(--bg);
+}
+
+.ae-calc-chip--product {
+  border-color: var(--text-h);
+  font-weight: 600;
+}
+
+.ae-calc-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.1rem 0;
+}
+
+.ae-calc-sum {
+  font-size: 0.78rem;
+  color: var(--text);
+  margin-top: 0.2rem;
+}
+
+.ae-calc-sum strong {
+  font-family: var(--mono);
+}
+
+/* Formula legend */
+.ae-formula-legend {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.78rem;
+  color: var(--text);
+}
+
+.ae-formula-legend code {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+
+/* Projection weight matrices */
+.ae-weights-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ae-weights-header h3 {
+  margin: 0;
+}
+
+.ae-toggle-btn {
+  font: inherit;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.ae-toggle-btn:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.ae-weight-panels {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ae-weight-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ae-weight-panel-label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.ae-weight-grid {
+  display: grid;
+  gap: 1px;
+  width: 72px;
+}
+
+.ae-weight-cell {
+  aspect-ratio: 1;
+  border-radius: 1px;
+}
+
 /* Attention bars */
 .ae-attn-bars {
   display: flex;
@@ -184,12 +401,31 @@
   opacity: 0.5;
 }
 
+.ae-attn-bar-row--header {
+  opacity: 0.6;
+}
+
+.ae-attn-bar-row--header .ae-attn-bar-score,
+.ae-attn-bar-row--header .ae-attn-bar-weight {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .ae-attn-bar-token {
   font-family: var(--mono);
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-h);
   min-width: 4.5rem;
+}
+
+.ae-attn-bar-score {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text);
+  min-width: 2.8rem;
+  text-align: right;
 }
 
 .ae-attn-bar-track {
@@ -215,5 +451,6 @@
 }
 
 @media (max-width: 768px) {
-  .ae-viz { flex-direction: column; }
+  .ae-top { flex-direction: column; }
+  .ae-explain-grid { grid-template-columns: 1fr; }
 }
