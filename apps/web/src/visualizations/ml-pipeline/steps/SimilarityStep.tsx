@@ -131,11 +131,16 @@ export default function SimilarityStep({ embeddings, matrix }: SimilarityStepPro
         <div className="pl-readout">
           <h3>How it works</h3>
           <p className="pl-info">
-            <code>cos(a, b) = (a · b) / (|a| × |b|)</code>
+            <code>sim(a, b) = exp(−d(a, b)² / (2σ²)), σ = 2</code>
             <br /><br />
-            Values range from <strong>-1</strong> (opposite) to <strong>+1</strong> (identical).
-            This matrix feeds into the attention mechanism, which learns which
-            relationships matter most for the task.
+            A Gaussian "closeness" score on the map: identical points → <strong>1</strong>,
+            far-apart points → <strong>~0</strong>. This is a warm-up intuition layer —
+            it shows <em>which words sit near each other</em>.
+          </p>
+          <p className="pl-info" style={{ marginTop: "0.5rem" }}>
+            Real attention does <strong>not</strong> reuse this matrix directly. It computes its own
+            <strong> dot-product scores</strong> between queries and keys (the next step) — those can be{" "}
+            <strong>negative</strong>, and softmax turns them into percentages.
           </p>
         </div>
       </div>

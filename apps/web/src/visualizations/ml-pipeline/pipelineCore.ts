@@ -2,10 +2,30 @@
 // framework-agnostic (no React) so it can be unit-tested deterministically and
 // shared between the interactive steps and the test suite.
 //
-// The vocabulary, the context formula, and the scoring all live here so that the
-// PredictStep UI and the tests exercise the exact same logic.
+// The vocabulary, the scoring, and the private attention computation all live
+// here so that the AttentionStep / PredictStep UI and the tests exercise the
+// exact same logic.
+//
+// ATTENTION MODEL: the pipeline's toy embeddings are 2D, so we run self-attention
+// with *identity projections* — each token acts as its own Query, Key and Value
+// (Q = K = V = the embedding). Every number is therefore traceable straight back
+// to the Embed step, while the computation is the real one:
+//
+//   scores[i][j] = q_i · k_j            (dot products — can be negative)
+//   scaled[i][j] = scores[i][j] / √d_k  (d_k = 2 here)
+//   weights[i][j] = softmax(scaled[i])  (each row sums to 1, temperature-aware)
+//   output[i]     = Σ_j weights[i][j] · v_j   (a blended 2D point)
 
+import {
+  fromVectors,
+  multiply,
+  transpose,
+  scaledDotProductAttention,
+  type Matrix,
+} from "@ml-visual-lab/ml-core";
 import { getBasePosition, getWordPosition, mapSimilarity, normalizeWord, categoryFor } from "./embeddingSpace";
+
+export { softmax } from "@ml-visual-lab/ml-core";
 
 export interface WordEmbedding {
   word: string;
@@ -19,9 +39,9 @@ export interface Prediction {
   category: string;
 }
 
-// All candidate next-words, grouped by semantic category. These must be subset of
-// (or consistent with) the CATEGORIES in embeddingSpace.ts so they live in the same
-// coordinate space as the sentence tokens.
+/** All candidate next-words, grouped by semantic category. These must be subset of
+ * (or consistent with) the CATEGORIES in embeddingSpace.ts so they live in the same
+ * coordinate space as the sentence tokens. */
 export const VOCAB_WORDS: { word: string; category: string }[] = [
   // Surfaces
   { word: "mat", category: "Surface" },
@@ -78,17 +98,8 @@ export const VOCAB_WORDS: { word: string; category: string }[] = [
   { word: "pay", category: "Money" },
 ];
 
-// Stopwords are skipped when picking the "last content word" for context, because
-// words like "the"/"to" carry no semantic weight and would drag predictions toward
-// the Function cluster at the origin.
-const STOPWORDS = new Set(["the", "a", "an", "of", "to", "on", "in", "at", "by", "with", "from", "and", "for", "is", "are", "was", "were"]);
-
 /** Words that should never be predicted (they'd always be wrong / are trivial). */
 const BLOCKED = new Set(["bank"]);
-
-export function isStopword(word: string): boolean {
-  return STOPWORDS.has(normalizeWord(word));
-}
 
 /** Compute sentence embeddings for each token (order-preserving, occurrence-aware). */
 export function generateEmbeddings(tokens: string[], seed: number): WordEmbedding[] {
@@ -107,36 +118,41 @@ export function computeSimilarityMatrix(embeddings: WordEmbedding[]): number[][]
   return embeddings.map((a) => embeddings.map((b) => mapSimilarity([a.x, a.y], [b.x, b.y])));
 }
 
-/** Softmax with an optional temperature (lower = sharper). */
-export function softmax(arr: number[], temperature: number): number[] {
-  const scaled = arr.map((x) => x / temperature);
-  const max = Math.max(...scaled);
-  const exps = scaled.map((x) => Math.exp(x - max));
-  const sum = exps.reduce((a, b) => a + b, 0);
-  return exps.map((x) => x / sum);
-}
-
-/** Self-attention weights from the similarity matrix via row-wise softmax. */
-export function computeAttention(simMatrix: number[][], temperature: number): number[][] {
-  return simMatrix.map((row) => softmax(row, temperature));
+export interface AttentionBreakdown {
+  /** raw dot-product queries against keys: q_i · k_j (can be negative) */
+  scores: Matrix;
+  /** scores scaled by 1/√d_k */
+  scaled: Matrix;
+  /** row-wise softmax of scaled — each row sums to 1 */
+  weights: Matrix;
+  /** blended values: output[i] = Σ_j weights[i][j] · v_j (one point per token) */
+  output: Matrix;
+  /** the embedding dimension used as d_k (2 in the pipeline) */
+  dK: number;
+  /** √d_k — the number every score is divided by */
+  scale: number;
 }
 
 /**
- * Builds the context vector used for next-word prediction.
- * Context = 0.75 * lastContentWord + 0.25 * sentenceAverage.
- * We skip stopwords for the "last content word" so the prediction is driven by the
- * most recent meaningful word (e.g. "sat" in "The cat sat on the ___") rather than a
- * trailing article like "the" or "to".
+ * Runs real scaled dot-product self-attention on the pipeline's 2D embeddings.
+ * Identity projections mean Q = K = V = the embeddings themselves, so the whole
+ * computation is visible: read the dot products, scale them, softmax them, blend.
  */
-export function contextVector(embeddings: WordEmbedding[]): [number, number] {
-  const contentEmbs = embeddings.filter((e) => !isStopword(e.word));
-  const pool = contentEmbs.length > 0 ? contentEmbs : embeddings;
+export function computeAttentionBreakdown(embeddings: WordEmbedding[], temperature: number): AttentionBreakdown {
+  const Q = fromVectors(...embeddings.map((e) => [e.x, e.y]));
+  const scores = multiply(Q, transpose(Q));
+  const { scores: scaled, weights, output } = scaledDotProductAttention(Q, Q, Q, temperature);
+  return { scores, scaled, weights, output, dK: 2, scale: Math.sqrt(2) };
+}
 
-  const avgX = pool.reduce((sum, e) => sum + e.x, 0) / pool.length;
-  const avgY = pool.reduce((sum, e) => sum + e.y, 0) / pool.length;
-
-  const last = pool[pool.length - 1];
-  return [last.x * 0.75 + avgX * 0.25, last.y * 0.75 + avgY * 0.25];
+/**
+ * The context used for next-word prediction: the *last* token asks the question,
+ * so its attended output (the blend of everyone's values it settled on) is what
+ * gets compared against the vocabulary.
+ */
+export function attentionContext(breakdown: AttentionBreakdown): [number, number] {
+  const row = breakdown.output[breakdown.output.length - 1];
+  return [row[0], row[1]];
 }
 
 /**
@@ -200,7 +216,7 @@ export function matchTrainingExample(inputTokens: string[]): { nextWord: string;
  *  1. CASE-BASED: look for a training example whose ending matches the tail of the input
  *     (the "similar input I've seen before" reasoning a child understands). If a match is
  *     found, the training answer's category is highlighted.
- *  2. GEOMETRIC: score every vocabulary word by similarity to the whole-sentence context,
+ *  2. GEOMETRIC: score every vocabulary word by similarity to the attention context,
  *     so even unseen inputs produce sensible, confidence-scaled predictions.
  *
  * The two are blended: the matched category's words get a boost, and geometric similarity

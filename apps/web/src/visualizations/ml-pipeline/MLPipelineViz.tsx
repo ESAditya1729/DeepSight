@@ -8,22 +8,22 @@ import PredictStep from "./steps/PredictStep";
 import {
   generateEmbeddings,
   computeSimilarityMatrix,
-  computeAttention,
+  computeAttentionBreakdown,
+  attentionContext,
+  type WordEmbedding,
+  type AttentionBreakdown,
 } from "./pipelineCore";
 import "./MLPipelineViz.css";
 
-export interface WordEmbedding {
-  word: string;
-  x: number;
-  y: number;
-}
+export type { WordEmbedding } from "./pipelineCore";
 
 export interface PipelineData {
   rawText: string;
   tokens: string[];
   embeddings: WordEmbedding[];
   similarityMatrix: number[][];
-  attentionWeights: number[][];
+  attention: AttentionBreakdown;
+  context: [number, number];
 }
 
 const STEPS = ["Input", "Tokenize", "Embed", "Similarity", "Attention", "Predict"] as const;
@@ -32,18 +32,19 @@ type StepIndex = 0 | 1 | 2 | 3 | 4 | 5;
 export default function MLPipelineViz() {
   const [currentStep, setCurrentStep] = useState<StepIndex>(0);
   const [seed, setSeed] = useState(42);
+  const [temperature, setTemperature] = useState(1.0);
 
   const [rawText, setRawText] = useState("The cat sat on the mat");
   const [tokens, setTokens] = useState<string[]>(["The", "cat", "sat", "on", "the", "mat"]);
 
   // Auto-compute downstream data when upstream changes
   const computed = useMemo(() => {
-    if (tokens.length === 0) return { embeddings: [], similarityMatrix: [], attentionWeights: [] };
+    if (tokens.length === 0) return null;
     const emb = generateEmbeddings(tokens, seed);
     const sim = computeSimilarityMatrix(emb);
-    const attn = computeAttention(sim, 1.0);
-    return { embeddings: emb, similarityMatrix: sim, attentionWeights: attn };
-  }, [tokens, seed]);
+    const attention = computeAttentionBreakdown(emb, temperature);
+    return { embeddings: emb, similarityMatrix: sim, attention };
+  }, [tokens, seed, temperature]);
 
   const handleTextChange = (text: string) => {
     setRawText(text);
@@ -61,23 +62,42 @@ export default function MLPipelineViz() {
   const goNext = () => { if (canGoNext()) setCurrentStep((s) => (s + 1) as StepIndex); };
   const goPrev = () => { if (canGoPrev()) setCurrentStep((s) => (s - 1) as StepIndex); };
 
-  const data: PipelineData = {
-    rawText,
-    tokens,
-    embeddings: computed.embeddings,
-    similarityMatrix: computed.similarityMatrix,
-    attentionWeights: computed.attentionWeights,
-  };
-
   const renderStep = () => {
+    if (!computed) return <div className="pl-step-content"><p className="pl-info">No tokens to process. Go back to the Input step.</p></div>;
     switch (currentStep) {
       case 0: return <InputStep text={rawText} onTextChange={handleTextChange} onPreset={handlePreset} />;
       case 1: return <TokenizeStep tokens={tokens} />;
       case 2: return <EmbedStep embeddings={computed.embeddings} seed={seed} onSeedChange={setSeed} />;
       case 3: return <SimilarityStep embeddings={computed.embeddings} matrix={computed.similarityMatrix} />;
-      case 4: return <AttentionStep tokens={tokens} weights={computed.attentionWeights} />;
-      case 5: return <PredictStep embeddings={computed.embeddings} tokens={tokens} seed={seed} />;
+      case 4:
+        return (
+          <AttentionStep
+            tokens={tokens}
+            embeddings={computed.embeddings}
+            breakdown={computed.attention}
+            temperature={temperature}
+            onTemperatureChange={setTemperature}
+          />
+        );
+      case 5:
+        return (
+          <PredictStep
+            embeddings={computed.embeddings}
+            tokens={tokens}
+            seed={seed}
+            context={attentionContext(computed.attention)}
+          />
+        );
     }
+  };
+
+  const data: PipelineData | null = computed && {
+    rawText,
+    tokens,
+    embeddings: computed.embeddings,
+    similarityMatrix: computed.similarityMatrix,
+    attention: computed.attention,
+    context: attentionContext(computed.attention),
   };
 
   return (
@@ -118,12 +138,15 @@ export default function MLPipelineViz() {
         <details className="pl-data-details">
           <summary className="pl-data-summary">View pipeline data</summary>
           <pre className="pl-data-pre">
-            {JSON.stringify({
+            {data ? JSON.stringify({
               tokens: data.tokens,
               embeddings: data.embeddings.slice(0, 3).map((e) => `${e.word}: [${e.x.toFixed(2)}, ${e.y.toFixed(2)}]`),
               similarity: data.similarityMatrix.length > 0 ? `${data.similarityMatrix.length}×${data.similarityMatrix[0].length} matrix` : "empty",
-              attention: data.attentionWeights.length > 0 ? `${data.attentionWeights.length}×${data.attentionWeights[0].length} matrix` : "empty",
-            }, null, 2)}
+              attention: `${data.attention.scores.length}×${data.attention.scores.length}`,
+              attentionWeights: data.attention.weights.map((row) => row.map((v) => v.toFixed(2))),
+              output: data.attention.output.map((row) => `[${row.map((v) => v.toFixed(2)).join(", ")}]`),
+              context: `[${data.context[0].toFixed(2)}, ${data.context[1].toFixed(2)}]`,
+            }, null, 2) : "no tokens"}
           </pre>
         </details>
       </div>

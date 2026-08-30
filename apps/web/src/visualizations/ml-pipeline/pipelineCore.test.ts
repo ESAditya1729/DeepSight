@@ -3,8 +3,8 @@ import {
   generateEmbeddings,
   computeSimilarityMatrix,
   softmax,
-  computeAttention,
-  contextVector,
+  computeAttentionBreakdown,
+  attentionContext,
   predictNextWord,
   positionVocab,
   VOCAB_WORDS,
@@ -68,36 +68,87 @@ describe("softmax", () => {
   });
 });
 
-describe("computeAttention", () => {
-  it("rows sum to 1", () => {
+describe("computeAttentionBreakdown", () => {
+  it("weights rows sum to 1 and are positive", () => {
     const embs = generateEmbeddings(["cat", "mat", "sat"], 42);
-    const m = computeSimilarityMatrix(embs);
-    const attn = computeAttention(m, 1);
-    for (const row of attn) {
+    const b = computeAttentionBreakdown(embs, 1);
+    expect(b.scores.length).toBe(3);
+    for (const row of b.weights) {
       const sum = row.reduce((a, b) => a + b, 0);
       expect(sum).toBeCloseTo(1, 8);
+      for (const v of row) expect(v).toBeGreaterThan(0);
+    }
+  });
+
+  it("uses identity projections: scores are dot products of the embeddings", () => {
+    const embs = generateEmbeddings(["cat", "mat", "sat"], 42);
+    const b = computeAttentionBreakdown(embs, 1);
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        const expected = embs[i].x * embs[j].x + embs[i].y * embs[j].y;
+        expect(b.scores[i][j]).toBeCloseTo(expected, 10);
+      }
+    }
+  });
+
+  it("scaled = score / √d_k with d_k = 2", () => {
+    const embs = generateEmbeddings(["cat"], 42);
+    const b = computeAttentionBreakdown(embs, 1);
+    expect(b.dK).toBe(2);
+    expect(b.scale).toBeCloseTo(Math.sqrt(2), 10);
+    const self = embs[0].x * embs[0].x + embs[0].y * embs[0].y;
+    expect(b.scaled[0][0]).toBeCloseTo(self / Math.sqrt(2), 10);
+  });
+
+  it("output is a convex combination of the value vectors", () => {
+    const embs = generateEmbeddings(["cat", "mat", "sat"], 42);
+    const b = computeAttentionBreakdown(embs, 1);
+    b.output.forEach((row, i) => {
+      const x = embs.reduce((sum, e, j) => sum + b.weights[i][j] * e.x, 0);
+      const y = embs.reduce((sum, e, j) => sum + b.weights[i][j] * e.y, 0);
+      expect(row[0]).toBeCloseTo(x, 8);
+      expect(row[1]).toBeCloseTo(y, 8);
+    });
+  });
+
+  it("lower temperature concentrates the weights", () => {
+    const embs = generateEmbeddings(["cat", "mat", "sat"], 42);
+    const sharp = computeAttentionBreakdown(embs, 0.1).weights;
+    const flat = computeAttentionBreakdown(embs, 5).weights;
+    for (let i = 0; i < 3; i++) {
+      expect(Math.max(...sharp[i])).toBeGreaterThanOrEqual(Math.max(...flat[i]));
     }
   });
 });
 
-describe("contextVector", () => {
-  it("favors the last content word over trailing stopwords", () => {
-    // "mat" is a Surface word; the stopword "the" sits near the origin.
-    // Context should be pulled toward the content words (mat is near (2,1.5)).
-    const embs = generateEmbeddings(["the", "mat"], 42);
-    const [cx] = contextVector(embs);
-    // Should be closer to mat (2,1.5) than to "the" (0,0)
-    const dxMat = Math.abs(cx - 2);
-    const dxThe = Math.abs(cx - 0);
-    expect(dxMat).toBeLessThan(dxThe);
+describe("attentionContext", () => {
+  it("single token: context is the token's own embedding", () => {
+    const embs = generateEmbeddings(["cat"], 42);
+    const b = computeAttentionBreakdown(embs, 1);
+    const [cx, cy] = attentionContext(b);
+    expect(cx).toBeCloseTo(embs[0].x, 10);
+    expect(cy).toBeCloseTo(embs[0].y, 10);
   });
 
-  it("handles a single token", () => {
-    const embs = generateEmbeddings(["cat"], 42);
-    const [cx, cy] = contextVector(embs);
-    const cat = embs[0];
-    expect(cx).toBeCloseTo(cat.x, 10);
-    expect(cy).toBeCloseTo(cat.y, 10);
+  it("multi token: context is the last token's attended output", () => {
+    const embs = generateEmbeddings(["cat", "mat", "sat"], 42);
+    const b = computeAttentionBreakdown(embs, 1);
+    const [cx, cy] = attentionContext(b);
+    const last = b.output[b.output.length - 1];
+    expect(cx).toBeCloseTo(last[0], 10);
+    expect(cy).toBeCloseTo(last[1], 10);
+  });
+
+  it("is a blend lying between the sentence's own embeddings", () => {
+    const embs = generateEmbeddings(["cat", "mat", "sat"], 42);
+    const b = computeAttentionBreakdown(embs, 1);
+    const [cx, cy] = attentionContext(b);
+    const xs = embs.map((e) => e.x);
+    const ys = embs.map((e) => e.y);
+    expect(cx).toBeGreaterThanOrEqual(Math.min(...xs) - 1e-9);
+    expect(cx).toBeLessThanOrEqual(Math.max(...xs) + 1e-9);
+    expect(cy).toBeGreaterThanOrEqual(Math.min(...ys) - 1e-9);
+    expect(cy).toBeLessThanOrEqual(Math.max(...ys) + 1e-9);
   });
 });
 
@@ -124,20 +175,22 @@ describe("predictNextWord", () => {
     expect(predictNextWord([2, 1.5], vocab, []).length).toBeLessThanOrEqual(8);
   });
 
-  it("predicts 'mat' for 'The cat sat on the ___'", () => {
+  it("predicts 'mat' for 'The cat sat on the ___' using the attention context", () => {
     const tokens = ["The", "cat", "sat", "on", "the"];
     const embs = generateEmbeddings(tokens, 42);
     const vocab = positionVocab(42);
-    const preds = predictNextWord(contextVector(embs), vocab, tokens);
+    const b = computeAttentionBreakdown(embs, 1);
+    const preds = predictNextWord(attentionContext(b), vocab, tokens);
     const expected = GROUND_TRUTH["The cat sat on the"];
     expect(preds[0].word).toBe(expected);
   });
 
-  it("predicts 'deposit' (a Money word) for 'She went to the bank to ___'", () => {
+  it("predicts 'deposit' (a Money word) for 'She went to the bank to ___' using the attention context", () => {
     const tokens = ["She", "went", "to", "the", "bank", "to"];
     const embs = generateEmbeddings(tokens, 42);
     const vocab = positionVocab(42);
-    const preds = predictNextWord(contextVector(embs), vocab, tokens);
+    const b = computeAttentionBreakdown(embs, 1);
+    const preds = predictNextWord(attentionContext(b), vocab, tokens);
     const expected = GROUND_TRUTH["She went to the bank to"];
     expect(preds[0].word).toBe(expected);
   });

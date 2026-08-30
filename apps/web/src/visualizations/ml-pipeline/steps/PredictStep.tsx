@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { type WordEmbedding } from "../MLPipelineViz";
-import { positionVocab, predictNextWord, contextVector, VOCAB_WORDS } from "../pipelineCore";
+import { positionVocab, predictNextWord, VOCAB_WORDS } from "../pipelineCore";
 import { categoryColor } from "../embeddingSpace";
 import "./steps.css";
 
@@ -8,6 +8,8 @@ interface PredictStepProps {
   embeddings: WordEmbedding[];
   tokens: string[];
   seed: number;
+  /** The attention output of the last token — the context the model predicts from. */
+  context: [number, number];
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -23,15 +25,15 @@ const CATEGORY_COLORS: Record<string, string> = {
   Money: "#8b5cf6",
 };
 
-export default function PredictStep({ embeddings, tokens, seed }: PredictStepProps) {
+export default function PredictStep({ embeddings, tokens, seed, context }: PredictStepProps) {
   // Position the vocabulary with the SAME seed and the SAME embedding space the
   // Embed step uses, so predictions are consistent with what's shown upstream.
   const vocab = useMemo(() => positionVocab(seed), [seed]);
 
   const predictions = useMemo(() => {
     if (embeddings.length === 0) return [];
-    return predictNextWord(contextVector(embeddings), vocab, tokens);
-  }, [embeddings, tokens, vocab]);
+    return predictNextWord(context, vocab, tokens);
+  }, [context, embeddings, tokens, vocab]);
 
   const inputPreview = tokens.join(" ") + " ___";
   const topPrediction = predictions[0];
@@ -111,8 +113,9 @@ export default function PredictStep({ embeddings, tokens, seed }: PredictStepPro
           </p>
           <ol className="pl-steps-list">
             <li>
-              <strong>Context vector</strong> — combine the word embeddings into one &quot;meaning&quot; vector.
-              We give the most weight to the last important word.
+              <strong>Attention context</strong> — the last token asked every other word for its value and
+              blended them by the attention weights from the previous step. Its blended vector{" "}
+              <code>[{context[0].toFixed(2)}, {context[1].toFixed(2)}]</code> is the &quot;meaning so far&quot;.
             </li>
             <li>
               <strong>Compare against the vocabulary</strong> — measure how close the context is to every
