@@ -1,0 +1,23 @@
+# DevOps -> GitHub mirror
+# Triggers on pushes to the main branch of the DevOps repo, then pushes
+# those commits to the GitHub repository. Netlify deploys from GitHub.
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- checkout: self
+  fetchDepth: 0
+  persistCredentials: true
+
+- script: |
+    git config --global user.email "azdo-mirror@users.noreply.github.com"
+    git config --global user.name "AZDO Mirror"
+    git remote add github https://$(GITHUB_TOKEN)@github.com/ESAditya1729/DeepSight.git
+    git push github HEAD:main
+  displayName: 'Push DevOps main to GitHub'
+  env:
+    GITHUB_TOKEN: $(GITHUB_TOKEN)
