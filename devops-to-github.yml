@@ -17,7 +17,7 @@ steps:
     git config --global user.email "azdo-mirror@users.noreply.github.com"
     git config --global user.name "AZDO Mirror"
     git remote remove github 2>nul
-    git remote add github https://$(GITHUB_TOKEN)@github.com/ESAditya1729/DeepSight.git
+    git remote add github https://x-access-token:%GITHUB_TOKEN%@github.com/ESAditya1729/DeepSight.git
     git push github HEAD:main
   displayName: 'Push DevOps main to GitHub'
   env:
