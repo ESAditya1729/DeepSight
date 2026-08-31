@@ -1,0 +1,107 @@
+.viz-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* ---------- "Next up" suggestion ---------- */
+.viz-nextup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 10px;
+  background: var(--accent-bg);
+  text-decoration: none;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.viz-nextup:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+.viz-nextup-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.viz-nextup-kicker {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent);
+}
+
+.viz-nextup-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.viz-nextup-desc {
+  font-size: 0.82rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.viz-nextup-arrow {
+  font-size: 1.3rem;
+  color: var(--accent);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ---------- Prev / Next ---------- */
+.viz-pager-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+  min-width: 0;
+}
+
+.viz-pager-link:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.viz-pager-link--next {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.viz-pager-dir {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.viz-pager-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-h);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.viz-pager-spacer {
+  height: 1px;
+}

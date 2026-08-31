@@ -1,0 +1,183 @@
+.home {
+  max-width: 100%;
+}
+
+/* ---------- Hero ---------- */
+.home-hero {
+  padding: 2.5rem 0 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.home-hero h1 {
+  font-size: 2.2rem;
+  margin: 0 0 0.6rem;
+}
+
+.home-hero .lede {
+  font-size: 1.02rem;
+  line-height: 1.6;
+  max-width: 46rem;
+}
+
+.home-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem 2rem;
+  margin-top: 0.5rem;
+}
+
+.home-hero-action {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.home-hero-action b {
+  color: var(--accent);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- Where to start ---------- */
+.home-path {
+  margin-bottom: 2.25rem;
+}
+
+.home-path-hint {
+  color: var(--text);
+  opacity: 0.75;
+  font-size: 0.85rem;
+  margin: 0 0 0.75rem;
+}
+
+.path-steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.path-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 0.85rem;
+  transition: all 0.15s;
+}
+
+.path-step:hover {
+  color: var(--text-h);
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.path-step-num {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+}
+
+.path-arrow {
+  color: var(--text);
+  opacity: 0.35;
+  font-size: 0.85rem;
+}
+
+/* ---------- Browse grid ---------- */
+.home-section-title {
+  font-size: 1.3rem;
+  margin: 0 0 1.25rem;
+}
+
+.viz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.viz-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.05rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  position: relative;
+}
+
+.viz-card:hover {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.viz-card-cat {
+  font-size: 0.62rem;
+  font-weight: 700;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent);
+}
+
+.viz-card-title {
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--text-h);
+  letter-spacing: -0.01em;
+}
+
+.viz-card-desc {
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--text);
+  margin: 0;
+  flex: 1;
+}
+
+.viz-card--visited {
+  border-color: var(--accent-border);
+}
+
+.viz-card-check {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.9rem;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.viz-card-go {
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.path-step-check {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.home-cat-heading {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text);
+  opacity: 0.75;
+  margin: 0 0 0.8rem;
+}

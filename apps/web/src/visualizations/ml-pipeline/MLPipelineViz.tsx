@@ -34,8 +34,8 @@ export default function MLPipelineViz() {
   const [seed, setSeed] = useState(42);
   const [temperature, setTemperature] = useState(1.0);
 
-  const [rawText, setRawText] = useState("The cat sat on the mat");
-  const [tokens, setTokens] = useState<string[]>(["The", "cat", "sat", "on", "the", "mat"]);
+  const [rawText, setRawText] = useState("The cat sat on the");
+  const [tokens, setTokens] = useState<string[]>(["The", "cat", "sat", "on", "the"]);
 
   // Auto-compute downstream data when upstream changes
   const computed = useMemo(() => {

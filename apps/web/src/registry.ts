@@ -65,6 +65,12 @@ export const visualizationRegistry: VisualizationEntry[] = [
     category: "embeddings",
   },
   {
+    slug: "contextual-embeddings",
+    title: "Word Senses & Contextual Embeddings",
+    description: "Watch one word become two meanings. The same “apple” starts at a single embedding, then self-attention shifts it toward a different sense in each sentence — with the attention matrices and next-word prediction shown live.",
+    category: "embeddings",
+  },
+  {
     slug: "neural-network",
     title: "Neural Network",
     description: "Watch a small neural network learn XOR in real time. See weights, activations, and loss evolve as training progresses.",

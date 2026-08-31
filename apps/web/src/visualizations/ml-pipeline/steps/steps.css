@@ -578,6 +578,75 @@
   font-family: var(--mono);
 }
 
+/* "Did you get it?" result card */
+.pl-gotit {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: 10px;
+  background: var(--code-bg);
+}
+
+.pl-gotit-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.pl-gotit-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.pl-gotit-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.pl-gotit--correct {
+  border-left-color: #059669;
+}
+
+.pl-gotit--correct .pl-gotit-badge {
+  background: #059669;
+}
+
+.pl-gotit--correct .pl-gotit-title {
+  color: #059669;
+}
+
+.pl-gotit--missed {
+  border-left-color: #d97706;
+}
+
+.pl-gotit--missed .pl-gotit-badge {
+  background: #d97706;
+}
+
+.pl-gotit--missed .pl-gotit-title {
+  color: #d97706;
+}
+
+.pl-gotit--plain {
+  border-left-color: var(--border);
+}
+
+.pl-gotit--plain .pl-gotit-badge {
+  background: var(--text);
+  opacity: 0.6;
+}
+
 /* Mask token */
 .pl-input-token--mask {
   background: var(--accent) !important;
