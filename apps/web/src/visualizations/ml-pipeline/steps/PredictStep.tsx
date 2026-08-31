@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { type WordEmbedding } from "../MLPipelineViz";
-import { positionVocab, predictNextWord, VOCAB_WORDS } from "../pipelineCore";
-import { categoryColor } from "../embeddingSpace";
+import { positionVocab, predictNextWord, VOCAB_WORDS, GROUND_TRUTH } from "../pipelineCore";
+import { categoryColor, normalizeWord } from "../embeddingSpace";
 import "./steps.css";
 
 interface PredictStepProps {
@@ -38,6 +38,25 @@ export default function PredictStep({ embeddings, tokens, seed, context }: Predi
   const inputPreview = tokens.join(" ") + " ___";
   const topPrediction = predictions[0];
   const vocabularyPreview = VOCAB_WORDS.slice(0, 12);
+
+  // Reference answer check: GROUND_TRUTH keys are the preset sentence stems (e.g.
+  // "The cat sat on the"). We also match the full sentence so that a typed-out
+  // answer ("The cat sat on the mat") is recognised and the model is validated
+  // against the word it was trained to produce.
+  const expected = useMemo(() => {
+    const full = tokens.map(normalizeWord).join(" ");
+    const withoutLast = tokens.slice(0, -1).map(normalizeWord).join(" ");
+    for (const [key, word] of Object.entries(GROUND_TRUTH)) {
+      const nk = normalizeWord(key);
+      if (nk === full || nk === withoutLast) return word;
+    }
+    return null;
+  }, [tokens]);
+
+  const predictedLabel = topPrediction?.word ?? null;
+  const predicted = predictedLabel ? normalizeWord(predictedLabel) : null;
+  const expectedNorm = expected ? normalizeWord(expected) : null;
+  const gotIt = expectedNorm !== null && predicted !== null && predicted === expectedNorm;
 
   return (
     <div className="pl-step-content">
@@ -94,14 +113,37 @@ export default function PredictStep({ embeddings, tokens, seed, context }: Predi
             {/* Top prediction highlight */}
             {topPrediction && (
               <g>
-                <rect x={20} y={310} width={340} height={0} rx={0} fill="none" />
-                <text x={190} y={310} textAnchor="middle" fontSize={11} fontFamily="var(--mono)"
+                <rect x={20} y={296} width={340} height={16} rx={8}
+                  fill={CATEGORY_COLORS[topPrediction.category] || categoryColor(topPrediction.word)} opacity={0.14} />
+                <text x={190} y={307} textAnchor="middle" fontSize={11} fontFamily="var(--mono)"
                   fontWeight={700} fill={CATEGORY_COLORS[topPrediction.category] || categoryColor(topPrediction.word)}>
                   Most likely: &quot;{topPrediction.word}&quot;
                 </text>
               </g>
             )}
           </svg>
+        </div>
+        <div className={`pl-gotit ${gotIt ? "pl-gotit--correct" : expected ? "pl-gotit--missed" : "pl-gotit--plain"}`}>
+          <div className="pl-gotit-head">
+            <span className="pl-gotit-title">
+              {gotIt ? "You got it!" : expected ? "Not quite" : "No reference answer"}
+            </span>
+            <span className="pl-gotit-badge">{gotIt ? "✓" : expected ? "✗" : "?"}</span>
+          </div>
+          {expected ? (
+            <p className="pl-info">
+              Model predicted <strong>{predictedLabel ? `"${predictedLabel}"` : "—"}</strong>.
+              Expected <strong>&quot;{expected}&quot;</strong>.
+              {gotIt
+                ? " The model found the word it was trained on — paddle the seed or sentence stem to see how far it generalises."
+                : " Try a different seed in the Embed step, or choose a preset sentence in the Input step and watch the top prediction change."}
+            </p>
+          ) : (
+            <p className="pl-info">
+              This sentence has no reference answer to check against. Pick a preset sentence in the{" "}
+              <strong>Input</strong> step to test your prediction.
+            </p>
+          )}
         </div>
       </div>
       <div className="pl-step-right">

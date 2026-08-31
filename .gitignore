@@ -1,5 +1,8 @@
 node_modules/
 dist/
+
+# Sprint planning notes (local only, not for deployment)
+sprint2.md
 .turbo/
 *.log
 .DS_Store

@@ -2,6 +2,7 @@
 // helpers, control components) reused across every visualization.
 
 export { useAnimationFrame } from "./useAnimationFrame.js";
+export { useKeyDown } from "./useKeyDown.js";
 export { PlaybackControls } from "./PlaybackControls.js";
 export { Slider } from "./Slider.js";
 export { EquationBlock } from "./EquationBlock.js";
